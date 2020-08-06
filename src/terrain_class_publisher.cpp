@@ -1,66 +1,76 @@
 // Publishes an integer value at a specified frequency
 
-#include <ros/ros.h>
-#include <std_msgs/Int8.h>
-#include <dynamic_reconfigure/server.h>
-#include "data_collection/TerrainClassIntegerConfig.h"
+#include <data_collection/terrain_class_publisher.h>
 
-
-void reconfigureCallback(data_collection::TerrainClassIntegerConfig &config, int8_t level)
+namespace data_collection
 {
-  ROS_INFO("Reconfigure request: %d", config.terrain_class_int);
+// Define the constructor of the class
+TerrainClassPublisher::TerrainClassPublisher(ros::NodeHandle nh) : nh_(nh), terrain_int_(8), enable_(true)
+{
+    // First, initialize the dynmaic reconfigure server and set the callback
+    dynamic_reconfigure::Server<data_collection::TerrainClassIntegerConfig>::CallbackType cb;
+    cb = boost::bind(&TerrainClassPublisher::reconfigureCallback, this, _1, _2);
+    dynamic_server_.setCallback(cb);
+
+    // Declare variable that can be modified by launch file of command line
+    double rate = 10.0;
+
+    // Initialize node parameters from launch file of command line using a private node handle
+    // This allows multiple instances to be run simultaneously with different parameters
+    ros::NodeHandle pnh("~");
+    pnh.param("terrain_int", terrain_int_, terrain_int_);
+    pnh.param("rate", rate, rate);
+    pnh.param("enable", enable_, enable_);
+
+    // Create the publisher and topic to publish on
+    if (enable_)
+    {
+        startPublisher();
+    }
+    // Timer
+    timer_ = nh_.createTimer(ros::Duration(1.0 / rate), &TerrainClassPublisher::timerCallback, this);
 }
 
-// Recall, main() is the primary access point of an executable into the programce
-int main(int argc, char **argv)
+void TerrainClassPublisher::startPublisher()
 {
-  // Initiate new ROS node called class_tracker_node
-  ros::init(argc, argv, "reconfigureable_class_tracker_node");
-  // Create a node handle
-  ros::NodeHandle nodehandle;
-  // Create a publisher with a topic "terrain_class" that will send an Int8 message
-  ros::Publisher terrain_class_publisher = nodehandle.advertise<std_msgs::Int8>("terrain_class", 100);
-  // Define the publishing rate
-  // In the future it would be good to sync this with the publishing rate (or up to a scale factor)
-  // of the publishing rate of the IMU
-  ros::Rate loop_rate(10); // Publishes at 10 Hz
+    pub_ = nh_.advertise<std_msgs::Int8>("terrain_class_integer", 100);
+}
 
-  int count = 0;
-  while (ros::ok()) // Keep spinning until user Ctrl+C's
-  {
+void TerrainClassPublisher::stopPublisher()
+{
+    pub_.shutdown();
+}
+
+void TerrainClassPublisher::reconfigureCallback(data_collection::TerrainClassIntegerConfig &config, uint32_t level __attribute__((unused)))
+{
+    // Assign the member variables new values according to which is input in the GUI
+    terrain_int_ = config.terrain_int;
+
+    // Ensure that node is still enabled
+    if (enable_ != config.enable)
+    {
+        if (config.enable)
+        {
+            startPublisher();
+        }
+        else
+        {
+            stopPublisher();
+        }
+    }
+    enable_ = config.enable;
+}
+
+void TerrainClassPublisher::timerCallback(const ros::TimerEvent &event __attribute__((unused)))
+{
+    if (!enable_)
+    {
+        return;
+    }
+
     std_msgs::Int8 msg;
+    msg.data = terrain_int_;
 
-    msg.data = 0;
-
-    ROS_INFO("[Publisher, %d] We are currently on terrain %d\n", count, msg.data);
-
-    terrain_class_publisher.publish(msg);
-
-    ros::spinOnce();
-
-    loop_rate.sleep(); // Sleep for the rest of the cycle
-    ++count;
-  }
-  return 0;
+    pub_.publish(msg);
 }
-
-
-
-int main(int argc, char **argv)
-{
-  ros::init(argc, argv, "class_reconfigure_server");
-  dynamic_reconfigure::Server<data_collection::TerrainClassIntegerConfig> server;
-  dynamic_reconfigure::Server<data_collection::TerrainClassIntegerConfig>::CallbackType f;
-
-  f = boost::bind(&reconfigureCallback, _1, _2);
-  server.setCallback(f);
-
-  ROS_INFO("Spinning node");
-  ros::spin();
-  return 0;
 }
-
-      
-
-   
-  
