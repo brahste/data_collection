@@ -25,6 +25,7 @@
 \usepackage{graphicx}
 \usepackage{enumitem}
 \usepackage{hyperref}
+\usepackage{verbatim}
 
 %----------------------------------------------------------------------------------------
 %	DOCUMENT INFORMATION
@@ -56,7 +57,8 @@ This document is designed to be a self-contained directive on rover operation fo
 
 %----------------------------------------------------------------------------------------
 
-\section{Sensors \& Hardware INCOMPLETE} 
+\section{Sensors \& Hardware INCOMPLETE}
+\label{sec:SensorsAndHardware}
 
 Three primary sensors are equipped on the rover:
 \begin{enumerate}
@@ -74,10 +76,27 @@ To command the rover from the Main Computer, ensure that it is connected through
 
 %----------------------------------------------------------------------------------------
 
-\section*{Task 2}
+\section{Software Configuration}
+
+The field testing experiments are implemented and governed by the ROS package \verb data_collection .  Code for the package is hosted at \url{https://github.com/brahste/data_collection}. Given that separate packages have been developed for each of the the three sensors outlined in Section~\ref{sec:SensorsAndHardware}, as well as the software to interface with the rover's themselves, the main access point to the hardware suite is through the launch file \verb data_collection_experiment.launch . Specific experimental parameters can be set from files in the \verb param/  folder prior to launch. Upon \verb roslaunch -ing, the master node is initialized, along with the following nodes:
+
+%\begin{enumerate}
+%\item \verb zed_node  (confirm name of this node); this node is responsible for publishing sterero-image messages. 
+%x\item \verb vectornav (confirm name of this node); this node is responsible for publishing messages from the IMU.
+%\item \verb current_sensing  (confirm name of this node); this node is responsible for publishing message of current draw from the rover.
+%\end{enumerate}
+
+%Available image types and imaging parameters are outlined in Appendix~\ref{app:NodeInformation}.
 
 \begin{problem}
 you can use a box as such
 \end{problem}
 
+%\cleardoublepage
+%\appendix
+
+\section{Node Information}
+\label{app:NodeInformation}
+
+blah
 \end{document}

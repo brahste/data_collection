@@ -1,0 +1,8 @@
+<!-- Husky CLC Data Collection Experiment -->
+<launch>
+
+	<node name="terrain_class_tracker" pkg="data_collection" type="terrain_class_tracker" />
+
+	<node name="rqt_reconfigure" pkg="rqt_reconfigure" type="rqt_reconfigure" />
+
+</launch>
