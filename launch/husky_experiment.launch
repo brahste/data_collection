@@ -3,6 +3,7 @@
 <launch>
   <!-- Initialize terrain class tracker node -->
   <node name="terrain_class_tracker" pkg="data_collection" type="terrain_class_tracker" />
+
   <!-- Initialize RQT GUI for easier reconfiguration of published terrain class -->
   <node name="rqt_reconfigure" pkg="rqt_reconfigure" type="rqt_reconfigure" />
 
@@ -10,8 +11,7 @@
   <!-- <group> -->
   <!--node name="rqt_reconfigure" pkg="rqt_reconfigure" type="rqt_reconfigure" -->
 
-  <!-- Include the zed-ros-wrapper functionality into the package -->
-  <!-- <include file="$(find zed_wrapper)/launch/zed.launch" /> -->
+  <!-- Launch the zed_node -->
+  <include file="$(find zed_wrapper)/launch/zed.launch" />
  
-  
 </launch>
