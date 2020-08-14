@@ -1,0 +1,102 @@
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[
+	12pt, % Default font size, values between 10pt-12pt are allowed
+	%letterpaper, % Uncomment for US letter paper size
+]{fphw}
+
+% Template-specific packages
+\usepackage[utf8]{inputenc} % Required for inputting international characters
+\usepackage[T1]{fontenc} % Output font encoding for international characters
+\usepackage[utf8]{inputenc}
+\usepackage[sc]{mathpazo} % Add osf to arguments for cool numbers
+\usepackage[scaled=0.90]{helvet}
+\usepackage[scaled=0.85]{beramono}
+
+\usepackage{subcaption}
+\usepackage{graphicx} % Required for including images
+\usepackage{booktabs} % Required for better horizontal rules in tables
+\usepackage{listings} % Required for insertion of code
+\usepackage{enumerate} % To modify the enumerate environment
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.13}
+\usepackage{graphicx}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{verbatim}
+
+%----------------------------------------------------------------------------------------
+%	DOCUMENT INFORMATION
+%----------------------------------------------------------------------------------------
+
+\title{2020 Field Testing Manual} % Assignment title
+
+\subtitle{Rover Setup, Connection, and ROS Configuration}
+
+\author{Braden Stefanuk} % Student name
+
+\date{\today} % Due date
+
+\institute{Areospace Robotics Laboratory} % Institute or school name
+
+%----------------------------------------------------------------------------------------
+
+\begin{document}
+
+\maketitle % Output the assignment title, created automatically using the information in the custom commands above
+
+%----------------------------------------------------------------------------------------
+%    CONTENT
+%----------------------------------------------------------------------------------------
+
+\section{Introduction}
+
+This document is designed to be a self-contained directive on rover operation for future researchers and students at the Aerospace Robotics Laboratory (ARL). Some content is reiterated from the document \textit{ConnectingControllingHuskyAndArgo} by J.S Fiset (see resources at \url{https://github.com/brahste/data_collection}). However, substantial changes to the field testing procedures have been implemented, warranting a new manual to explain the setup, both experimental and configurational.
+
+%----------------------------------------------------------------------------------------
+
+\section{Sensors \& Hardware INCOMPLETE}
+\label{sec:SensorsAndHardware}
+
+Three primary sensors are equipped on the rover:
+\begin{enumerate}
+\item a ZED stereo-camera (ZED cam)
+\item a VectorNav Inertial Measurement Unit (IMU)
+\item FDTI current sensors for the front left and right wheels
+\end{enumerate}
+To incorporate the ZED cam into the sensor suite a laptop with a CUDA capable GPU is required. For this purpose, a Lenovo P53 with a GTX 1080 Ti is used.
+
+%----------------------------------------------------------------------------------------
+
+\section{Network Setup}
+
+To command the rover from the Main Computer, ensure that it is connected through a hub. For our experiments a Cisco Wireless Access Point/Hub was used.
+
+%----------------------------------------------------------------------------------------
+
+\section{Software Configuration}
+
+The field testing experiments are implemented and governed by the ROS package \verb data_collection .  Code for the package is hosted at \url{https://github.com/brahste/data_collection}. Given that separate packages have been developed for each of the the three sensors outlined in Section~\ref{sec:SensorsAndHardware}, as well as the software to interface with the rover's themselves, the main access point to the hardware suite is through the launch file \verb data_collection_experiment.launch . Specific experimental parameters can be set from files in the \verb param/  folder prior to launch. Upon \verb roslaunch -ing, the master node is initialized, along with the following nodes:
+
+%\begin{enumerate}
+%\item \verb zed_node  (confirm name of this node); this node is responsible for publishing sterero-image messages. 
+%x\item \verb vectornav (confirm name of this node); this node is responsible for publishing messages from the IMU.
+%\item \verb current_sensing  (confirm name of this node); this node is responsible for publishing message of current draw from the rover.
+%\end{enumerate}
+
+%Available image types and imaging parameters are outlined in Appendix~\ref{app:NodeInformation}.
+
+\begin{problem}
+you can use a box as such
+\end{problem}
+
+%\cleardoublepage
+%\appendix
+
+\section{Node Information}
+\label{app:NodeInformation}
+
+blah
+\end{document}
