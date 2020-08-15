@@ -31,7 +31,7 @@
 %these are auxiliary definitions used in the title section
 \newcommand{\CourseLang}{Cour}
 \newcommand{\DateLang}{Date}
-\newcommand{\AuthorLang}{Author}
+\newcommand{\AuthorLang}{Authors}
 \newcommand{\ProfessorLang}{Professor}
 
 % Header and footers, we will use the titles also
@@ -87,8 +87,7 @@
 \renewcommand{\footrulewidth}{0.4pt}
 \fancyhead[RO] {\footnotesize\thepage}
 \fancyhead[LO] {\footnotesize{\ifx\classlocal\undefined{}\else\itshape\classlocal{} --{} \fi}\makeatletter\@title\makeatother }
-\fancyfoot[RO] {\footnotesize\itshape\makeatletter\@
-	\makeatother}
+\fancyfoot[RO] {\footnotesize\itshape\makeatletter\makeatother}
 
 % New title style for the document
 \renewcommand{\maketitle}{%

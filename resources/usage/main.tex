@@ -27,6 +27,11 @@
 \usepackage{hyperref}
 \usepackage{verbatim}
 
+\usepackage{xcolor}
+\definecolor{light-gray}{gray}{0.95}
+\newcommand{\code}[1]{\colorbox{light-gray}{\texttt{#1}}}
+
+
 %----------------------------------------------------------------------------------------
 %	DOCUMENT INFORMATION
 %----------------------------------------------------------------------------------------
@@ -35,7 +40,7 @@
 
 \subtitle{Rover Setup, Connection, and ROS Configuration}
 
-\author{Braden Stefanuk} % Student name
+\author{Braden S. \& Pierre-Lucas A.F.} % Student name
 
 \date{\today} % Due date
 
@@ -57,28 +62,68 @@ This document is designed to be a self-contained directive on rover operation fo
 
 %----------------------------------------------------------------------------------------
 
-\section{Sensors \& Hardware INCOMPLETE}
+\section{Sensors \& Hardware}
 \label{sec:SensorsAndHardware}
 
-Three primary sensors are equipped on the rover:
+An overview of the sensor and hardware suite is shown in Fig.~\ref{fig:SetupOverview}. Three primary sensors are equipped on the rover setup:
 \begin{enumerate}
-\item a ZED stereo-camera (ZED cam)
-\item a VectorNav Inertial Measurement Unit (IMU)
-\item FDTI current sensors for the front left and right wheels
+	\item a ZED stereo-camera (ZED cam). This dual-camera device acts as the eyes of the experimental setup and collects visual data in a variety of forms. For more information on this device see Appendix~\ref{app:NodeInformation}.
+	\item a VectorNav-100 Inertial Measurement Unit (IMU). This device gathers information about linear accelerations and angular velocities  induced in the rover chassis. It also provides integrals of these dynamic values (linear velocities, linear positions, angular positions). See Appendix~\ref{app:NodeInformation} for more information.
+	\item Motor current sensors (MC sensors). These sensors detect the current being drawn by the front right and left wheels. See Appendix~\ref{app:NodeInformation} for more information.
 \end{enumerate}
+
+These sensors are connected as shown in Fig.~\ref{fig:SetupOverview} to two different computers, a third computer is used to remotely access and command the experiments; information on these computers follows:
+\begin{enumerate}
+	\item \emph{arl-thinkpad}: a Lenovo P53 laptop. This laptop is bound to the top of the Husky and is equipped with a GTX 1080 Ti Graphical Processing Unit (GPU) which allows it to operate the ZED cam. The \emph{arl-thinkpad} is responsible for hosting the data collection experiments, for initializing the sensor suite, and for commanding data logging procedures and rover motions.
+	\item \emph{cpr-conu1}: a rover dedicated computer. This computer is located in the bed of the Husky and serves as the ROS interface to Husky's drivetrain, as well as to the IMU and MC sensors. Although this computer plays an essential role in the field testing sessions, it is never directly accessed, instead commands to this computer are implicitly defined within the ROS configuration on \emph{arl-thinkpad}.
+	\item Workstation: any other computer suitable for the needs of the experiment. This computer is used to SSH into \emph{arl-thinkpad}, from which the commands are launched. Ideally, this computer is a small, portable laptop with a strong battery life.
+\end{enumerate}
+
+
 To incorporate the ZED cam into the sensor suite a laptop with a CUDA capable GPU is required. For this purpose, a Lenovo P53 with a GTX 1080 Ti is used.
+
+\begin{figure}
+	\centering
+	\includegraphics[scale=1]{figs/SetupOverview.eps}
+	\caption{Overview of hardware Setup for 2020 field testing session. The workstation uses SSH to access \emph{arl-thinkpad}, where the \code{data\_collection} package is located. Sensor nodes and motion commands are launched from \emph{arl-thinkpad}, sending information over the network to \emph{cpr-conu1} when needed. Notice that although commands are sent from \emph{arl-thinkpad}, the Master URI is configured to be on \emph{cpr-conu1}; the reason for this is related to launch-on-boot features of the Husky and is discussed further in Section~\ref{sec:SoftwareConfiguration}.}
+	\label{fig:SetupOverview}
+\end{figure}
 
 %----------------------------------------------------------------------------------------
 
-\section{Network Setup}
+\section{Network Configuration}
+\label{sec:NetworkConfiguration}
+
 
 To command the rover from the Main Computer, ensure that it is connected through a hub. For our experiments a Cisco Wireless Access Point/Hub was used.
+
+\subsection{Usage}
+\label{subsec:NetworkConfigurationUsage}
 
 %----------------------------------------------------------------------------------------
 
 \section{Software Configuration}
+\label{sec:SoftwareConfiguration}
 
-The field testing experiments are implemented and governed by the ROS package \verb data_collection .  Code for the package is hosted at \url{https://github.com/brahste/data_collection}. Given that separate packages have been developed for each of the the three sensors outlined in Section~\ref{sec:SensorsAndHardware}, as well as the software to interface with the rover's themselves, the main access point to the hardware suite is through the launch file \verb data_collection_experiment.launch . Specific experimental parameters can be set from files in the \verb param/  folder prior to launch. Upon \verb roslaunch -ing, the master node is initialized, along with the following nodes:
+\subsection{Overview}
+
+The field testing experiments are implemented using an array of different ROS packages, shell scripts, and devices; at the highest level these verious software items are localized and governed by the ROS package \code{data\_collection}. Code for the package is hosted at \url{https://github.com/brahste/data_collection}. The main access point to the hardware suite is through the launch file \code{husky\_experiment.launch}. Since Husky launches its nodes on boot-up (from the files in \code{/etc/ros/kinetic/ros.d}), \code{husky\_experiment.launch} is responsible for initializing the nodes for peripheral sensors only. A secondary consequence of the Husky nodes intializing on boot is that it is simplest to use \emph{cpr-conu1} as the Master URI. 
+
+Although \emph{arl-thinkpad} hosts the main data collection package and the ZED node, to accomodate the preconfigured ROS setup, packages for the IMU and motor current sensors remain on \emph{cpr-conu1}. Since the Husky node initializes on boot, for this field testing session it was chosen to use \emph{cpr-conu1} as the Master URI. Future researchers may find it desirable to connect and configure all sensors to \textit{arl-thinkpad} and disable the launch-on-boot feature of Husky, this way the Master URI could be assigned to \textit{arl-thinkpad} and complications regarding network latency would be less pronounced.
+
+\subsection{Usage}
+
+\begin{enumerate}
+\item Before moving forward with this section, ensure the steps from Section~\ref{subsec:NetworkConfigurationUsage} are complete. Most importantly the \code{ROS\_MASTER\_URI}, hostnames, and IPs must be set correctly. At this point the Husky node should be running, this can be confirmed by calling \code{rosnode list}. If the nodes [...enter the names of a few nodes...] are up, then indeed the Husky node is running.
+	
+\item Initialize the peripheral sensors with: \\
+  \code{roslaunch data\_collection husky\_experiment.launch}
+  
+\qquad Running \code{rostopic list} you should now be able to see that \code{imu/rpy}, \code{imu/imu}, and \code{zed/*} are being published. As a sanity check (or for debugging) you can run /code{rostopic echo <topic\_name>} and see the data streams from each sensor in your terminal.
+
+\end{enumerate}
+
+Upon \code{roslaunch}-ing, the master node is initialized, along with the following nodes:
 
 %\begin{enumerate}
 %\item \verb zed_node  (confirm name of this node); this node is responsible for publishing sterero-image messages. 
@@ -88,15 +133,20 @@ The field testing experiments are implemented and governed by the ROS package \v
 
 %Available image types and imaging parameters are outlined in Appendix~\ref{app:NodeInformation}.
 
+\section{Running the Experiment}
+
 \begin{problem}
 you can use a box as such
 \end{problem}
 
-%\cleardoublepage
-%\appendix
+\cleardoublepage
+\appendix
+
+\section{Operating System Configuration}
+\label{app:OperatingSystemConfiguration}
 
 \section{Node Information}
 \label{app:NodeInformation}
 
-blah
+
 \end{document}
