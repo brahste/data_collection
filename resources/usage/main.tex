@@ -107,9 +107,11 @@ To command the rover from the Main Computer, ensure that it is connected through
 
 \subsection{Overview}
 
-The field testing experiments are implemented using an array of different ROS packages, shell scripts, and devices; at the highest level these verious software items are localized and governed by the ROS package \code{data\_collection}. Code for the package is hosted at \url{https://github.com/brahste/data_collection}. The main access point to the hardware suite is through the launch file \code{husky\_experiment.launch}. Since Husky launches its nodes on boot-up (from the files in \code{/etc/ros/kinetic/ros.d}), \code{husky\_experiment.launch} is responsible for initializing the nodes for peripheral sensors only. A secondary consequence of the Husky nodes intializing on boot is that it is simplest to use \emph{cpr-conu1} as the Master URI. 
+The field testing experiments are implemented using an array of different ROS packages, shell scripts, and devices; at the highest level these verious software items are localized and governed by the ROS package \code{data\_collection}. Code for the package is hosted at \url{https://github.com/brahste/data_collection}. The main access point to the hardware suite is through the file \code{husky\_sensors.launch}. Since Husky launches its nodes on boot-up (from the files in \code{/etc/ros/kinetic/}), \code{husky\_sensors.launch} is responsible for initializing the nodes for peripheral sensors only. A secondary consequence of the Husky nodes intializing on boot is that it is simplest to use \emph{cpr-conu1} as the Master URI (as shown in Fig.~\ref{fig:SetupOverview}). 
 
-Although \emph{arl-thinkpad} hosts the main data collection package and the ZED node, to accomodate the preconfigured ROS setup, packages for the IMU and motor current sensors remain on \emph{cpr-conu1}. Since the Husky node initializes on boot, for this field testing session it was chosen to use \emph{cpr-conu1} as the Master URI. Future researchers may find it desirable to connect and configure all sensors to \textit{arl-thinkpad} and disable the launch-on-boot feature of Husky, this way the Master URI could be assigned to \textit{arl-thinkpad} and complications regarding network latency would be less pronounced.
+Although \emph{arl-thinkpad} hosts the main data collection package and the ZED node, packages for the IMU and motor current sensors had been configured for past field tests on \emph{cpr-conu1}; we have left this configuration intact. Since the Husky node initializes on boot, for this field testing session it was chosen to use \emph{cpr-conu1} as the Master URI. Future researchers may find it desirable to connect and configure all sensors to \textit{arl-thinkpad} and disable the launch-on-boot feature of Husky, this way the Master URI could be assigned to \textit{arl-thinkpad} and complications regarding network latency would be less pronounced.
+
+Note that \code{husky\_sensors.launch} initializes nodes that exist on both \emph{arl-thinkpad} and \emph{cpr-conu1}. To enable this feature an environment configuration file \code{husky\_env.sh}, located in the main catkin workspace of \emph{cpr-conu1}, must be called when launching nodes over the network. 
 
 \subsection{Usage}
 
@@ -117,7 +119,7 @@ Although \emph{arl-thinkpad} hosts the main data collection package and the ZED 
 \item Before moving forward with this section, ensure the steps from Section~\ref{subsec:NetworkConfigurationUsage} are complete. Most importantly the \code{ROS\_MASTER\_URI}, hostnames, and IPs must be set correctly. At this point the Husky node should be running, this can be confirmed by calling \code{rosnode list}. If the nodes [...enter the names of a few nodes...] are up, then indeed the Husky node is running.
 	
 \item Initialize the peripheral sensors with: \\
-  \code{roslaunch data\_collection husky\_experiment.launch}
+  \code{roslaunch data\_collection husky\_sensors.launch}
   
 \qquad Running \code{rostopic list} you should now be able to see that \code{imu/rpy}, \code{imu/imu}, and \code{zed/*} are being published. As a sanity check (or for debugging) you can run /code{rostopic echo <topic\_name>} and see the data streams from each sensor in your terminal.
 
