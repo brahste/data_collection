@@ -1,0 +1,27 @@
+<!--
+Husky CLC Data Collection Experiment:
+This launch file is used to initialize peripheral sensors and should
+be called before any actually motion-based experimentation is conducted.
+-->
+
+<launch>
+  <!-- Initialize terrain class tracker node -->
+  <node name="terrain_class_tracker" pkg="data_collection" type="terrain_class_tracker" />
+
+  <!-- Initialize RQT GUI for easier reconfiguration of published terrain class -->
+  <node name="rqt_reconfigure" pkg="rqt_reconfigure" type="rqt_reconfigure" />
+
+  <!-- Launch the zed_node -->
+  <!-- <include file="$(find zed_wrapper)/launch/zed.launch" /> -->
+
+  <!-- Launch the IMU node -->
+  <group>
+    <machine name="cpr-conu1" address="192.168.131.100" user="administrator" env-loader="/home/administrator/catkin_ws/husky_env.sh" default="true" />
+    <include file="$(find imu_vn_100)/launch/vn_100_cont.launch">
+      <arg name="binary_async_mode" default="1" />
+      <arg name="enable_rpy" default="true" />
+      <arg name="port" default="/dev/ttyUSB1" />
+    </include>
+  </group>	
+
+</launch>
