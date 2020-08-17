@@ -8,10 +8,21 @@
   <node name="rqt_reconfigure" pkg="rqt_reconfigure" type="rqt_reconfigure" />
 
   <!-- Initialize current sensor nodes in a group -->
-  <!-- <group> -->
-  <!--node name="rqt_reconfigure" pkg="rqt_reconfigure" type="rqt_reconfigure" -->
+  <!-- <group> -->>
 
   <!-- Launch the zed_node -->
-  <include file="$(find zed_wrapper)/launch/zed.launch" />
- 
+  <!-- <include file="$(find zed_wrapper)/launch/zed.launch" /> -->
+
+  <!-- Initialize IMU nodes from launch file on rover -->
+  <!-- <include file="vn_100_cont.launch" /> -->
+  <group>
+	<machine name="cpr-conu1" address="192.168.131.100" user="administrator" env-loader="/home/administrator/catkin_ws/husky_env.sh" default="true" />
+	<!--	<include file="administrator@192.168.131.100:/home/administrator/catkin_ws/src/imu_vn_100-master/launch/vn_100_cont.launch"> -->
+	<include file="$(find imu_vn_100)/launch/vn_100_cont.launch">
+		<arg name="binary_async_mode" default="1" />
+		<arg name="enable_rpy" default="true" />
+		<arg name="port" default="/dev/ttyUSB1" />
+	</include>
+  </group>	
+
 </launch>
