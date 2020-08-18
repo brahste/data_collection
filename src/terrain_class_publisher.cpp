@@ -12,10 +12,10 @@ TerrainClassPublisher::TerrainClassPublisher(ros::NodeHandle nh) : nh_(nh), terr
     cb = boost::bind(&TerrainClassPublisher::reconfigureCallback, this, _1, _2);
     dynamic_server_.setCallback(cb);
 
-    // Declare variable that can be modified by launch file of command line
+    // Declare variable that can be modified by launch file or command line
     double rate = 10.0;
 
-    // Initialize node parameters from launch file of command line using a private node handle
+    // Initialize node parameters from launch file or command line using a private node handle
     // This allows multiple instances to be run simultaneously with different parameters
     ros::NodeHandle pnh("~");
     pnh.param("terrain_int", terrain_int_, terrain_int_);
@@ -25,7 +25,8 @@ TerrainClassPublisher::TerrainClassPublisher(ros::NodeHandle nh) : nh_(nh), terr
     // Create the publisher and topic to publish on
     if (enable_)
     {
-        startPublisher();
+      startPublisher();
+      //startPublisher(pnh.getParam("rate", rate));
     }
     // Timer
     timer_ = nh_.createTimer(ros::Duration(1.0 / rate), &TerrainClassPublisher::timerCallback, this);
@@ -33,12 +34,13 @@ TerrainClassPublisher::TerrainClassPublisher(ros::NodeHandle nh) : nh_(nh), terr
 
 void TerrainClassPublisher::startPublisher()
 {
-    pub_ = nh_.advertise<std_msgs::Int8>("terrain_class_integer", 100);
+  double rate;
+  pub_ = nh_.advertise<std_msgs::Int8>("terrain_class_integer", ros::param::get("rate", rate));
 }
 
 void TerrainClassPublisher::stopPublisher()
 {
-    pub_.shutdown();
+   pub_.shutdown();
 }
 
 void TerrainClassPublisher::reconfigureCallback(data_collection::TerrainClassIntegerConfig &config, uint32_t level __attribute__((unused)))

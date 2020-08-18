@@ -142,7 +142,7 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(
-	terrain_class_tracker 
+	terrain_class_publisher
 	src/nodes/terrain_class_publisher_node.cpp
 	src/terrain_class_publisher.cpp
 )
@@ -156,14 +156,14 @@ add_executable(
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 add_dependencies(
-	terrain_class_tracker
+	terrain_class_publisher
 	data_collection_gencfg
 #	data_collection_generate_messages_cpp	
 )
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(
-	terrain_class_tracker
+	terrain_class_publisher
 	${catkin_LIBRARIES}
 )
 
