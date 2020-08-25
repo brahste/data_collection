@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE ipe SYSTEM "ipe.dtd">
 <ipe version="70206" creator="Ipe 7.2.7">
-<info created="D:20200804110235" modified="D:20200815160047"/>
+<info created="D:20200804110235" modified="D:20200825112003"/>
 <ipestyle name="basic">
 <symbol name="arrow/arc(spx)">
 <path stroke="sym-stroke" fill="sym-stroke" pen="sym-pen">
@@ -418,7 +418,21 @@ h
 <text matrix="1 0 0 1 -36 -4" transformations="translations" pos="232 768" stroke="black" type="label" width="38.356" height="6.918" depth="0" valign="baseline">Ethernet</text>
 <text matrix="1 0 0 1 -44 4" transformations="translations" pos="240 744" stroke="black" type="label" width="36.391" height="6.918" depth="0" valign="baseline">Wireless</text>
 <text matrix="1 0 0 1 -36 -4" transformations="translations" pos="196 796" stroke="black" type="label" width="74.997" height="6.815" depth="1.93" valign="baseline">Connection Type</text>
-<text matrix="1 0 0 1 -48 -48" transformations="translations" pos="192 544" stroke="black" type="label" width="129.875" height="9.803" depth="0" valign="baseline" size="Large">ROS\_MASTER\_URI:</text>
-<text matrix="1 0 0 1 0 -32" transformations="translations" pos="144 512" stroke="black" type="label" width="149.251" height="8.965" depth="2.99" valign="baseline" size="large">http://192.131.168.100:11311</text>
+<text matrix="1 0 0 1 -40 -36" transformations="translations" pos="192 544" stroke="black" type="label" width="108.229" height="8.169" depth="0" valign="baseline" size="large">ROS\_MASTER\_URI:</text>
+<text matrix="1 0 0 1 -12 -16" transformations="translations" pos="144 512" stroke="black" type="label" width="149.251" height="8.965" depth="2.99" valign="baseline" size="large">http://192.131.168.100:11311</text>
+<path matrix="0.886364 0 0 0.666667 14.5455 178.667" stroke="black">
+128 512 m
+128 464 l
+304 464 l
+304 512 l
+h
+</path>
+<path matrix="1 0 0 1 0 12" stroke="black">
+224 496 m
+224 496 l
+224 496 l
+224 496 l
+h
+</path>
 </page>
 </ipe>

@@ -26,11 +26,31 @@
 \usepackage{enumitem}
 \usepackage{hyperref}
 \usepackage{verbatim}
+\usepackage{listing}
 
 % Create command for code-type text in document
 \usepackage{xcolor}
 \definecolor{light-gray}{gray}{0.95}
-\newcommand{\code}[1]{\colorbox{light-gray}{\texttt{#1}}}
+\newcommand{\code}[1]{\colorbox{light-gray}{\lstinline|#1|}}
+
+% Define coloring for justified code snippets
+\definecolor{codered}{rgb}{0.9,0.2,0.2}
+\definecolor{codeblue}{rgb}{0,0.6,0.9}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{background}{rgb}{0.95,0.95,0.95}
+\lstdefinestyle{bstef}{
+	language=python,
+	tabsize=4,
+	%numbers=left,
+	numberstyle=\small\color{codegray},
+	commentstyle=\color{codered},
+	keywordstyle=\color{codeblue},
+	backgroundcolor=\color{background},
+	basicstyle=\small \ttfamily,
+	morekeywords={global, function, for, end, public, byte, return, new, length, lambda, export}
+}
+\lstset{style=bstef}
 
 
 %----------------------------------------------------------------------------------------
@@ -152,40 +172,99 @@ Each experimental trial consists of a CLC-type path and a data logging procedure
 \begin{figure}
   \centering
   \includegraphics[width=0.6\textwidth]{figs/HuskyPanel.jpg}
+  \caption{View of Husky status indicator lights on back panel.}
+  \label{fig:HuskyPanel}
 \end{figure}
 
 \subsection{Pre-experimental setup}
 \begin{enumerate}
-\item \textbf{Ensure the ZED cam is connected to \emph{arl-thinkpad}.} The connectivity of the ZED cam can be confirmed by ... [finish this section later].
+\item \textbf{Ensure the ZED cam is connected to \emph{arl-thinkpad}.}
 
 \item \textbf{Ensure the IMU is connected to Husky's dedicated computer (\emph{cpr-conu1}).}
 
 \item \textbf{Ensure both \emph{arl-thinkpad} and \emph{cpr-conu1} are connected via ethernet to the WAE/Hub and that the WAE/Hub is connected to power.} The ports that the computers are connected to are irrelevant, at the time of writing \emph{arl-thinkpad} was connected to Port 1 and \emph{cpr-conu1} was connected to Port 3.
 
 \item \textbf{Ensure the Husky is either elevated with its wheels free (for in-lab testing), or you are in a large unobstructed area (for experimental testing).} Most importantly, \underline{do not} launch \code{husky\_experiment.launch} without precaution.
+
+\item (recommended) \textbf{Have a third \emph{workstation} computer ready.} This computer will be used to SSH into \emph{arl-thinkpad} to send commands remotely, it can also optionally be used to dynamically log the terrain class during experimental trials.
   
 \end{enumerate}
   
 \subsection{Starting the Experiment}
 \begin{enumerate}
-\item \textbf{Power on the Husky, \emph{cpr-conu1}, and \emph{arl-thinkpad}.} Because of Husky's launch-on-boot feature \code{roscore} will be initialized in the background.
+\item \textbf{Power on the Husky, \emph{cpr-conu1}, and \emph{arl-thinkpad}.} After a few seconds the \emph{communication status} light should turn green (marked in pink in Fig.~\ref{fig:HuskyPanel}) Because of Husky's launch-on-boot feature, \code{roscore} will be initialized in the background. You can run \code{\$ rosnode list} to see the nodes that are already up and running. Note that the \code{/imu/data} node is a Husky internal node and is not the node used for reading VectorNav data.
 
 \item \textbf{On \emph{arl-thinkpad} open a terminal}\footnote{This computer has been set up with terminator, a terminal emulator. Use Ctrl(Fn)+Shift+E and Ctrl(Fn)+Shift+O to split the terminal vertically and horizonatally.}. The environment has been automatically configured in the \code{.bashrc} file; you should see the ROS hostname, IP, and Master URI printed just above the command line.
+
+\underline{In \code{.bashrc} on \emph{arl-thinkpad}...}
+
+\begin{lstlisting}
+# Set Husky computer as master node
+export ROS_MASTER_URI=http://192.168.131.100:11311
+# Configure IP and hostname
+export ROS_IP=192.168.131.99
+export ROS_HOSTNAME=192.168.131.99
+\end{lstlisting}
   
 \item (optional) \textbf{To verify connectivity you can access \emph{cpr-conu1} with,} \\
-  \code{ssh administrator@cpr-conu1}. The SSH keys have already been configured so no password should be required; the ROS hostname, IP, and Master URI should also be shown just above the command line. Since the launch files depend on known SSH keys, if a password is prompted you may run into difficulties when running launch files in later steps. Either way, the password is: clearpath.
+  \code{\$ ssh administrator@cpr-conu1}. The SSH keys have already been configured so no password should be required; the ROS hostname, IP, and Master URI should also be shown just above the command line. Since the launch files depend on known SSH keys, if a password is prompted you may run into difficulties when running launch files in later steps. Either way, the password is: clearpath.
+  
+\underline{In \code{.bashrc} on \emph{cpr-conu1}...}
+  
+\begin{lstlisting}
+# Set this computer as master node
+export ROS_MASTER_URI=http://192.168.131.100:11311
+# Configure IP and hostname
+export ROS_IP=192.168.131.100
+export ROS_HOSTNAME=192.168.131.100
+\end{lstlisting}
 
-\item \textbf{Run} \code{\$ roslaunch data\_collection husky\_sensors.launch}. This command starts the various sensor nodes given the arguments in the executed launch file. It is worth the time so analyze the SUMMARY output to understand the values set on the parameter server and which nodes were initialized. An \code{rqt\_reconfigure} GUI will appear, here you can interact with the \\ \code{/terrain\_class\_publisher} value. It is recommended that parameters for the \code{/husky\_velocity\_controller} are left untouched.
+\item \textbf{In the terminal you just opened on \emph{arl-thinkpad} run,} \\ \code{arl@arl-thinkpad:\$ roslaunch data\_collection husky\_sensors.launch}. This command starts the various sensor nodes. It is recommended that new users analyze the SUMMARY output to understand the values set on the parameter server and which nodes were initialized.
 
-\item (optional) \textbf{Verify topic publications with,} \code{rostopic echo <topic\_name>}.
+\item (optional) \textbf{Verify topic publications with,} \code{\$ rostopic echo <topic\_name>}. You can receive a list of topics with \code{\$ rostopic list}, but if all went correctly then the list will be saturated with \code{/zed/*} related topics. The topics that are of specific interest are
+\begin{enumerate}
+	\item \code{/imu/rpy} and \code{/imu/imu}. These are the topics that are published by the VectorNav IMU.
+	\item \code{/zed/zed\_node/rgb/image\_rect\_color}. This is one of \underline{many} topics available for collection with the ZED cam. The user may wish to parse the available topics and select the one that fits their data product requirements.
+	\item \code{/terrain\_class\_integer} This topic publishes an integer at the same rate as IMU publication, it is used to classify the terrain as the experiment proceeds.
+\end{enumerate}
+
+\item \textbf{On the \emph{workstation} computer, connect to the wireless network CONU01-LSYS2G.} The password is: husky\_wireless. This will link the \emph{workstation} to the same network as the other devices; you may wish to manually change the IP of your workstation device to ensure that it does not conflict with any other devices on the network (I changed mine to 192.168.131.101). It is also convenient to set up the \code{.bashrc} file similar to the other computers such that the Master URI is automatically linked to \emph{cpr-conu1}. To do so, copy and paste the following code into your \emph{workstation}'s \code{.bashrc},
+
+\begin{lstlisting}
+# Set Husky as master node
+export ROS_MASTER_URI=http://192.168.131.100:11311
+# Configure IP and hostname
+export ROS_IP=192.168.131.101
+export ROS_HOSTNAME=192.168.131.101
+\end{lstlisting}
+
+\item (recommended) \textbf{Setup \emph{workstation} to remotely reconfigure experimental parameters.} To do this, open a terminal and conduct the following steps,
+
+\begin{enumerate}
+	\item Set the Master URI with, \\ \code{\$ export ROS\_MASTER\_URI=http://192.168.131.100:11311}. \\ (This step is unnecessary if you set up the \code{.bashrc} in Step 6 above)
+	\item Open the RQT reconfigure GUI with, \\ \code{\$ rosrun rqt\_reconfigure rqt\_reconfigure}.
+\end{enumerate}
+
+An \code{rqt\_reconfigure} GUI will appear, here you can interact with the \\ \code{/terrain\_class\_publisher} value and various parameters for the ZED cam. It is recommended that parameters for the \code{/husky\_velocity\_controller} are left untouched.
+
+\item \textbf{Access \emph{arl-thinkpad} from your remote \emph{workstation} with} \code{\$ ssh arl@192.168.131.99}. The password is: ARL2020\textbackslash\textbackslash.
 
 \end{enumerate}
- 
+
 \subsection{Running Experimental Trials}
 
 \begin{enumerate}
 
-\item \textbf{As a first test, run} \code{\$ roslaunch data\_collection husky\_experiment.launch}. This will start the Husky moving along the default path. You should be able to see the port-side wheels turning faster than the starboard-side. A \code{.bag} file will be saved in the \code{bag/} directory with all trial parameters. Since the algorithm depends on IMU inputs to know when it is has reached the selected yaw, if this command is run when the Husky is elevated, you will have to Ctrl+C out of the program. With default parameters it will take approximately 30 seconds for the published topics to be bagged.
+\item \textbf{As a first test, in your SSH session run,} \\ \code{arl@arl-thinkpad:\$ roslaunch data\_collection husky\_experiment.launch}. This will start the Husky moving along the default path. You should be able to see the port-side wheels turning faster than the starboard-side (right-hand turn). A \code{.bag} file will be saved in the \code{bags/} directory with all trial parameters. Since the algorithm depends on IMU inputs to know when it is has reached the selected yaw, if this command is run when the Husky is elevated, you will have to Ctrl+C out of the program. With default parameters it will take approximately 30 seconds for the published topics to be bagged.
+
+\item \textbf{Continue to launch experiments with the same command.} To manage experimental parameters you can either alter the (default) arguments directly in the launch file, or you can use command line arguments to set values. For example, if you would like to change the turning radius followed by the rover you can use either of the following approaches,
+\begin{enumerate}
+	\item Open \code{husky\_experiment.launch} with you preferred editor. Find the "turning\_radius" tag, \code{<arg name="turning\_radius... />}. Change the default property to the desired turning radius, \code{...default="<float>"...}. Save the file and relaunch.
+	
+	\item Run the command, \\ \code{\$ roslaunch data\_collection husky\_experiment.launch turning\_radius:=<float>}
+\end{enumerate}
+
+Where the placeholder \code{<float>} is replaced by a floating point value of your choosing. In either case a bag will be saved in \code{bags/} with the newly specified turning radius.
 
 \end{enumerate}
 
