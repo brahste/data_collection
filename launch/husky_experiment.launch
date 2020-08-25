@@ -12,20 +12,20 @@ commanding the Husky along a CLC/CLP/PLC/PLP type path
   <arg name="left_first"     default="false" doc="(bool) Perform left turn first, then right" />
   <arg name="vc"             default="0.2" doc="(float) Absolute commanded velocity (m/s)" />
   <arg name="turning_radius" default="1.0" doc="(float) Turning radius for both circular arcs (m)" />
-  <arg name="distance"       default="5.0" doc="(float) Distance on linear segement (m)" />
-  <arg name="dt_1"           default="-30.0" doc="(float) Angular displacement of first circular arc (+ve=ccw; deg)" />
-  <arg name="dt_2"           default="30.0" doc="(float) Angular displacement of second circular arc (+ve=ccw; deg)" />
+  <arg name="distance"       default="2.0" doc="(float) Distance on linear segement (m)" />
+  <arg name="dt_1"           default="-15.0" doc="(float) Angular displacement of first circular arc (+ve=ccw; deg)" />
+  <arg name="dt_2"           default="15.0" doc="(float) Angular displacement of second circular arc (+ve=ccw; deg)" />
   <!-- Do some calculations to retrieve time in motion -->
   <arg name="arclength_1" value="$(eval abs(arg('dt_1'))*(3.14159/180.0)*arg('turning_radius'))" />
   <arg name="arclength_2" value="$(eval abs(arg('dt_2'))*(3.14159/180.0)*arg('turning_radius'))" />
-  <arg name="time_in_motion" value="$(eval (arg('arclength_1') + arg('arclength_2') + arg('distance')) / arg('vc'))" />
+  <arg name="time_in_motion" value="$(eval (arg('arclength_1') + arg('arclength_2') + arg('distance')) / arg('vc') + 5)" />
 
   <!-- Start bag recording -->
   <node name="rosbag_recorder" pkg="rosbag" type="record"
         args="record
 	      --duration=$(arg time_in_motion)
 	      --output-prefix /home/arl/bags/rfirst-$(arg right_first)_vc-$(arg vc)_R-$(arg turning_radius)_d-$(arg distance)_dt1-$(arg dt_1)_dt2-$(arg dt_2)_t-$(arg time_in_motion)
-	      /imu/rpy /imu/imu /terrain_class_integer"
+	      /imu/rpy /imu/imu /terrain_class_integer /zed/zed_node/rgb/image_rect_color"
 	/>
   
   <!-- Execute CLC path -->
