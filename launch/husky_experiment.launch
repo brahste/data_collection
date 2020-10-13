@@ -7,18 +7,20 @@ commanding the Husky along a CLC/CLP/PLC/PLP type path
 
 <launch>
 
+  <arg name="clc_on"         default="false" doc="(bool) Toggle CLC motion command. Use with caution." 
+
   <!-- Argumets used to specify the CLC path followed during each experimental trial -->
-  <arg name="right_first"    default="true" doc="(bool) Perform right turn first, then left" />
-  <arg name="left_first"     default="false" doc="(bool) Perform left turn first, then right" />
-  <arg name="vc"             default="0.2" doc="(float) Absolute commanded velocity (m/s)" />
-  <arg name="turning_radius" default="1.0" doc="(float) Turning radius for both circular arcs (m)" />
-  <arg name="distance"       default="2.0" doc="(float) Distance on linear segement (m)" />
-  <arg name="dt_1"           default="-15.0" doc="(float) Angular displacement of first circular arc (+ve=ccw; deg)" />
-  <arg name="dt_2"           default="15.0" doc="(float) Angular displacement of second circular arc (+ve=ccw; deg)" />
+  <arg name="right_first"    default="true" if="$(arg clc_on)" doc="(bool) Perform right turn first, then left" />
+  <arg name="left_first"     default="false" if="$(arg clc_on)" doc="(bool) Perform left turn first, then right" />
+  <arg name="vc"             default="0.2" if="$(arg clc_on)" doc="(float) Absolute commanded velocity (m/s)" />
+  <arg name="turning_radius" default="1.0" if="$(arg clc_on)" doc="(float) Turning radius for both circular arcs (m)" />
+  <arg name="distance"       default="2.0" if="$(arg clc_on)" doc="(float) Distance on linear segement (m)" />
+  <arg name="dt_1"           default="-15.0" if="$(arg clc_on)" doc="(float) Angular displacement of first circular arc (+ve=ccw; deg)" />
+  <arg name="dt_2"           default="15.0" if="$(arg clc_on)" doc="(float) Angular displacement of second circular arc (+ve=ccw; deg)" />
   <!-- Do some calculations to retrieve time in motion -->
-  <arg name="arclength_1" value="$(eval abs(arg('dt_1'))*(3.14159/180.0)*arg('turning_radius'))" />
-  <arg name="arclength_2" value="$(eval abs(arg('dt_2'))*(3.14159/180.0)*arg('turning_radius'))" />
-  <arg name="time_in_motion" value="$(eval (arg('arclength_1') + arg('arclength_2') + arg('distance')) / arg('vc') + 5)" />
+  <arg name="arclength_1" if="$(arg clc_on)" value="$(eval abs(arg('dt_1'))*(3.14159/180.0)*arg('turning_radius'))" />
+  <arg name="arclength_2" if="$(arg clc_on)" value="$(eval abs(arg('dt_2'))*(3.14159/180.0)*arg('turning_radius'))" />
+  <arg name="time_in_motion" if="$(arg clc_on)" value="$(eval (arg('arclength_1') + arg('arclength_2') + arg('distance')) / arg('vc') + 5)" />
 
   <!-- Start bag recording -->
   <node name="rosbag_recorder" pkg="rosbag" type="record"
@@ -29,7 +31,7 @@ commanding the Husky along a CLC/CLP/PLC/PLP type path
 	/>
   
   <!-- Execute CLC path -->
-  <group>
+  <group if="$(arg clc_on)">
     <machine name="cpr-conu1" address="192.168.131.100" user="administrator" env-loader="/home/administrator/catkin_ws/husky_env.sh" default="true" />
     <node name="clc_cmd" pkg="husky_pkg" type="clc_cmd" machine="cpr-conu1" output="screen"
 	  args="--right_first    $(arg right_first)

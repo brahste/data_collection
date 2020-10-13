@@ -1,0 +1,46 @@
+<!--
+Argo CLC Data Collection Experiment:
+This launch file is used to initialize peripheral sensors and should
+be called before any actually motion-based experimentation is conducted.
+-->
+
+<launch>
+
+  <!-- Set up some arguments for command line -->
+  <arg name="imu_usb_port" default="ttyUSB0" />
+  <arg name="imu_rate" default="200" />
+
+  <!-- Set simulation time parameter -->
+  <!-- <param name="/use_sim_time" value="true" /> -->
+  
+  <!-- Initialize terrain class tracker node -->
+  <node name="terrain_class_tracker" pkg="data_collection" type="terrain_class_tracker" args="_rate:=$(arg imu_rate)"/>
+
+  <!-- Initialize RQT GUI for easier reconfiguration of published terrain class -->
+  <!-- <node name="rqt_reconfigure" pkg="rqt_reconfigure" type="rqt_reconfigure" /> -->
+
+  <!-- Launch the zed_node -->
+  <include file="$(find zed_wrapper)/launch/zed.launch" />
+
+  <!-- Launch the IMU node -->
+  <include file="$(find imu_vn_100)/launch/vn_100_cont.launch" >
+    <arg name="binary_async_mode" default="1" />
+    <arg name="enable_rpy" default="true" />
+    <arg name="port" default="/dev/$(arg imu_usb_port)" />
+    <arg name="imu_rate" default="$(arg imu_rate)" />
+  </include>
+
+  <!-- Launch the IMU node -->
+  <group>
+    <machine name="cpr-conu1" address="192.168.1.30" user="ugv" env-loader="/home/administrator/catkin_ws/argo_env.sh" default="true" />
+    <!-- TODO: 1) Create an argo_env.sh script that sets the environment variables
+               2) Determine whether I have to launch the argo node manually -->
+    <!-- <include file="$(find imu_vn_100)/launch/vn_100_cont.launch">
+      <arg name="binary_async_mode" default="1" />
+      <arg name="enable_rpy" default="true" />
+      <arg name="port" default="/dev/$(arg imu_usb_port)" />
+      <arg name="imu_rate" default="$(arg imu_rate)" />
+    </include> -->
+  </group>	
+
+</launch>

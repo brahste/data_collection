@@ -1,0 +1,18 @@
+<!--
+Argo CLC Data Collection Experiment:
+This launch file is used to initialize the commanded experiment. It starts by reading
+a shell script that starts bagging the specified published topics, and follows by
+commanding the Husky along a CLC/CLP/PLC/PLP type path
+-->
+
+<launch>
+
+    <!-- TODO: Change the topics being recorded to those published by the Argo-->
+  <!-- Start bag recording -->
+  <node name="rosbag_recorder" pkg="rosbag" type="record"
+        args="record
+	      --output-prefix /home/arl/bags/argo-transition-
+	      /imu/rpy /imu/imu /terrain_class_integer /zed/zed_node/rgb/image_rect_color"
+	/>
+
+</launch>
