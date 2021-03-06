@@ -1,2 +1,6 @@
-# Ignore the usage latex files
-#resources/usage/
+# Ignore latex by-product files
+**/*.aux
+**/*.dvi
+**/*.log
+**/*.out
+**/*.synctex.gz
