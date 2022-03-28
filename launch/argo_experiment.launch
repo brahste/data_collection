@@ -11,8 +11,8 @@ commanding the Husky along a CLC/CLP/PLC/PLP type path
   <!-- Start bag recording -->
   <node name="rosbag_recorder" pkg="rosbag" type="record"
         args="record
-	      --output-prefix /home/arl/bags/argo-transition-
-	      /imu/rpy /imu/imu /terrain_class_integer /zed/zed_node/rgb/image_rect_color"
+	      --output-prefix /home/arl/bags/argo-transition
+	      /imu/rpy /imu/imu /terrain_class_integer /zed_throttled /zed/zed_node/odom /zed/zed_node/pose"
 	/>
 
 </launch>

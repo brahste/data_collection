@@ -1,0 +1,10 @@
+<!-- This file will export frames from a bag file into the ~/.ros folder -->
+<launch>
+
+  <arg name="bagfile" default="None" />
+  <node pkg="rosbag" type="play" name="rosbag" required="true" args="/home/brahste/Documents/masters_docs/datasets/FieldTests-2020-10-14/$(arg bagfile)" />
+  <node name="extract" pkg="image_view" type="extract_images" respawn="false" required="true" output="screen" cwd="ROS_HOME">
+   <remap from="image" to="/zed_throttled" />
+  </node>
+
+</launch>

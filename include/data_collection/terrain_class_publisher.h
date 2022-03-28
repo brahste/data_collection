@@ -51,5 +51,8 @@ class TerrainClassPublisher
 
 		// Flag to enable/disable node
 		bool enable_;
+
+		// Rate of publication
+		//double rate_;
 };
 }

@@ -1,5 +1,5 @@
 // Publishes an integer value at a specified frequency
-
+#include <iostream>
 #include <data_collection/terrain_class_publisher.h>
 
 namespace data_collection
@@ -13,7 +13,7 @@ TerrainClassPublisher::TerrainClassPublisher(ros::NodeHandle nh) : nh_(nh), terr
     dynamic_server_.setCallback(cb);
 
     // Declare variable that can be modified by launch file or command line
-    double rate = 10.0;
+    double rate = 200.0;
 
     // Initialize node parameters from launch file or command line using a private node handle
     // This allows multiple instances to be run simultaneously with different parameters
@@ -34,8 +34,9 @@ TerrainClassPublisher::TerrainClassPublisher(ros::NodeHandle nh) : nh_(nh), terr
 
 void TerrainClassPublisher::startPublisher()
 {
-  double rate;
-  pub_ = nh_.advertise<std_msgs::Int8>("terrain_class_integer", ros::param::get("rate", rate));
+  double rate = rate;
+  std::cout << rate << std::endl;
+  pub_ = nh_.advertise<std_msgs::Int8>("terrain_class_integer", rate);
 }
 
 void TerrainClassPublisher::stopPublisher()
